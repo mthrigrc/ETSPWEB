@@ -100,3 +100,48 @@ function render() {
 
 typeInput.addEventListener("change", updateCategories);
 
+form.addEventListener("submit", event => {
+  event.preventDefault();
+  formMessage.textContent = "";
+
+  const amount = Number(amountInput.value);
+  if (!dateInput.value || !typeInput.value || !categoryInput.value) {
+    formMessage.textContent = "Tanggal, tipe, dan kategori wajib diisi.";
+    return;
+  }
+  if (!Number.isFinite(amount) || amount <= 0) {
+    formMessage.textContent = "Nominal harus lebih besar dari 0.";
+    amountInput.focus();
+    return;
+  }
+
+  transactions.push({
+    id: Date.now(),
+    date: dateInput.value,
+    type: typeInput.value,
+    category: categoryInput.value,
+    amount,
+    note: noteInput.value.trim()
+  });
+
+  saveTransactions();
+  render();
+  amountInput.value = "";
+  noteInput.value = "";
+  amountInput.focus();
+});
+
+document.getElementById("clearButton").addEventListener("click", () => {
+  if (!transactions.length) {
+    alert("Belum ada transaksi untuk dihapus.");
+    return;
+  }
+  if (confirm("Yakin ingin menghapus SEMUA transaksi? Data tidak bisa dikembalikan.")) {
+    transactions = [];
+    saveTransactions();
+    render();
+  }
+});
+
+updateCategories();
+render();
